@@ -87,6 +87,16 @@ fi
 AC_SUBST(HAVE_GST)
 AM_CONDITIONAL(HAVE_GST, test x$HAVE_GST = xyes)
 
+AC_ARG_WITH( omxplayer,
+  AC_HELP_STRING([--with-omxplayer],[compile with Omxplayer support]),
+  try_omxplayer=$withval, try_omxplayer=no )
+HAVE_OMXPLAYER=no
+if test x$try_omxplayer = xyes; then
+  HAVE_OMXPLAYER=yes
+  AC_DEFINE(HAVE_OMXPLAYER, , [Use Omxplayer])
+fi
+AC_SUBST(HAVE_OMXPLAYER)
+AM_CONDITIONAL(HAVE_OMXPLAYER, test x$HAVE_OMXPLAYER = xyes)
 
 LIBUPNP_REQUIRED=1.6.0
 AC_ARG_WITH( libupnp,

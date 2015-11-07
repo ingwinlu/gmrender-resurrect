@@ -38,15 +38,17 @@
 #ifdef HAVE_GST
 #include "output_gstreamer.h"
 #endif
+#ifdef HAVE_OMXPLAYER
+#include "output_omxplayer.h"
+#endif
 #include "output.h"
 
 static struct output_module *modules[] = {
 #ifdef HAVE_GST
 	&gstreamer_output,
-#else
-	// this will be a runtime error, but there is not much point
-	// in waiting till then.
-#error "No output configured. You need to ./configure --with-gstreamer"
+#endif
+#ifdef HAVE_OMXPLAYER
+        &omxplayer_output,
 #endif
 };
 

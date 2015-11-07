@@ -18,6 +18,11 @@ gmediarender_SOURCES += \
 	output_gstreamer.c  output_gstreamer.h
 endif
 
+if HAVE_OMXPLAYER
+gmediarender_SOURCES += \
+	output_omxplayer.c output_omxplayer.h
+endif
+
 main.c : git-version.h
 
 git-version.h: .FORCE
