@@ -41,10 +41,7 @@
 #endif
 
 #include <upnp/ithread.h>
-
-// For version strings of upnp and gstreamer
 #include <upnp/upnpconfig.h>
-#include <gst/gst.h>
 
 #include "git-version.h"
 #include "logging.h"
@@ -170,10 +167,9 @@ static void log_variable_change(void *userdata, int var_num,
 static void init_logging(const char *log_file) {
 	char version[1024];
 	snprintf(version, sizeof(version), "[ gmediarender %s "
-		 "(libupnp-%s; glib-%d.%d.%d; gstreamer-%d.%d.%d) ]",
+		 "(libupnp-%s; glib-%d.%d.%d ]",
 		 GM_COMPILE_VERSION, UPNP_VERSION_STRING,
-		 GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION,
-		 GST_VERSION_MAJOR, GST_VERSION_MINOR, GST_VERSION_MICRO);
+		 GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 	if (log_file != NULL) {
 		Log_init(log_file);
 		Log_info("main", "%s log started %s", PACKAGE_STRING, version);

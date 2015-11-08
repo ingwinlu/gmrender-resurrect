@@ -486,8 +486,10 @@ static void prepare_next_stream(GstElement *obj, gpointer userdata) {
 	}
 }
 
-static int output_gstreamer_init(void)
-{
+static int output_gstreamer_init(void) {
+	Log_info("gstreamer", "Init version %d.%d.%d",
+		 GST_VERSION_MAJOR, GST_VERSION_MINOR, GST_VERSION_MICRO);
+
 	GstBus *bus;
 
 	SongMetaData_init(&song_meta_);
