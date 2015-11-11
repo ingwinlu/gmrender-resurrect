@@ -85,7 +85,14 @@ static void dbus_callback_setup(
         GAsyncResult *res,
         gpointer user_data) {
     Log_info("omxplayer", "init dbus");
-    dbus_con = g_bus_get_finish(res, NULL);
+    GError *g_error = NULL;
+    dbus_con = g_bus_get_finish(res, &g_error);
+    if(g_error) {
+        Log_error("omxplayer", "Error: %s", g_error->message);
+        g_error_free(g_error);
+        return -1;
+    };
+
     Log_info("omxplayer", "subscribe to omxplayer");
     g_dbus_connection_signal_subscribe(
             dbus_con,
