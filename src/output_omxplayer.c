@@ -50,6 +50,13 @@
  */
 
 static gchar player_state = OMX_STOPPED;
+
+// stuff used for callbacks from transport
+static struct SongMetaData song_meta_;
+static output_update_meta_cb_t meta_update_callback_ = NULL;
+static output_transition_cb_t play_trans_callback_ = NULL;
+
+// spawn stuff, might be able to slim down once dbus is setup
 static gchar *omx_argv[] = {"omxplayer.bin", "-b", "-o", "both", "--live", NULL, NULL};
 static const gint omx_argv_url_pos = 5;
 static gchar *omx_uri_ = NULL;
@@ -58,17 +65,41 @@ static gint omx_in;
 static GIOChannel *omx_in_ch;
 static GPid omx_pid;
 
-static struct SongMetaData song_meta_;
-static output_update_meta_cb_t meta_update_callback_ = NULL;
-static output_transition_cb_t play_trans_callback_ = NULL;
+// dbus
+static GDBusConnection *dbus_con = NULL;
 
-/*
-struct track_time_info {
-	gint64 duration;
-	gint64 position;
-};
-static struct track_time_info last_known_time_ = {0, 0};
-*/
+static void dbus_callback_signal(
+        GDBusConnection *con,
+        const gchar *sender_name,
+        const gchar *object_path,
+        const gchar *interface_name,
+        const gchar *signal_name,
+        GVariant *parameters,
+        gpointer user_data) {
+    Log_info("dbus", "\nsender %s\npath %s\ninterface %s\nsignal %s\n",
+             sender_name, object_path, interface_name, signal_name);
+}
+
+static void dbus_callback_setup(
+        GObject *source_object,
+        GAsyncResult *res,
+        gpointer user_data) {
+    Log_info("omxplayer", "init dbus");
+    dbus_con = g_bus_get_finish(res, NULL);
+    Log_info("omxplayer", "subscribe to omxplayer");
+    g_dbus_connection_signal_subscribe(
+            dbus_con,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            G_DBUS_SIGNAL_FLAGS_NONE,
+            (GDBusSignalCallback) dbus_callback_signal,
+            NULL,
+            NULL
+    );
+}
 
 static int output_omxplayer_add_options(GOptionContext *ctx) {
 	return 0;
@@ -277,6 +308,13 @@ static int output_omxplayer_set_mute(int m) {
 static int output_omxplayer_init(void){
 	Log_info("omxplayer", "init");
         SongMetaData_init(&song_meta_);
+
+        g_bus_get(
+                G_BUS_TYPE_SESSION,
+                NULL,
+                (GAsyncReadyCallback) dbus_callback_setup,
+                NULL
+        );
         return 0;
 /*
 	GstBus *bus;
