@@ -86,11 +86,18 @@ static void dbus_callback_setup(
         gpointer user_data) {
     Log_info("omxplayer", "init dbus");
     GError *g_error = NULL;
+    dbus_con = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &g_error);
+    if(g_error) {
+        Log_error("omxplayer", "Error: %s", g_error->message);
+        g_error_free(g_error);
+        return;
+    };
+
     dbus_con = g_bus_get_finish(res, &g_error);
     if(g_error) {
         Log_error("omxplayer", "Error: %s", g_error->message);
         g_error_free(g_error);
-        return -1;
+        return;
     };
 
     Log_info("omxplayer", "subscribe to omxplayer");
